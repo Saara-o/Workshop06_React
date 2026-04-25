@@ -50,33 +50,57 @@ router.get('/:id', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  // TODO (student): Implement UPDATE operation for one post.
-  // Suggested steps:
+  // Implement UPDATE operation for one post.
+  // Steps:
   // 1) Keep ObjectId validation for req.params.id.
-  // 2) Update the post with req.body using Post.findByIdAndUpdate().
-  // 3) Use { new: true, runValidators: true } so validation runs and the updated doc is returned.
-  // 4) Return 404 if no post exists with this id.
-  // 5) Return 400 for validation errors and 500 for other server errors.
   if (!isValidObjectId(req.params.id)) {
     return res.status(400).json({ error: 'Invalid post id' });
   }
+  // 2) Update the post with req.body using Post.findByIdAndUpdate().
+  try {
+    const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
+    // 3) Use { new: true, runValidators: true } so validation runs and the updated doc is returned.
+      new: true,
+      runValidators: true,
+    });
+    // 4) Return 404 if no post exists with this id.
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found'})
 
-  return res.status(501).json({ message: 'TODO: implement PUT /api/posts/:id' });
+    }
+    res.json(post);
+  
+  // 5) Return 400 for validation errors and 500 for other server errors.
+  } catch (error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message});
+      }
+      res.status(500).json({ error: error.messsage});
+  }
 });
 
 router.delete('/:id', async (req, res) => {
-  // TODO (student): Implement DELETE operation for one post.
-  // Suggested steps:
+  // Implement DELETE operation for one post.
+
   // 1) Keep ObjectId validation for req.params.id.
-  // 2) Delete the post using Post.findByIdAndDelete().
-  // 3) Return 404 if no post exists with this id.
-  // 4) Return a success JSON message when deletion succeeds.
-  // 5) Return 500 for unexpected server errors.
   if (!isValidObjectId(req.params.id)) {
     return res.status(400).json({ error: 'Invalid post id' });
   }
+  // 2) Delete the post using Post.findByIdAndDelete().
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    // 3) Return 404 if no post exists with this id.
+      if (!post) {
+        return res.status(404)({ error: 'Post not found'});
+  }
+  // 4) Return a success JSON message when deletion succeeds.
+  res.json({ message: 'Post deleted succesfully'});
 
-  return res.status(501).json({ message: 'TODO: implement DELETE /api/posts/:id' });
+  // 5) Return 500 for unexpected server errors.
+  } catch (error) {
+    res.status(500).json({ error: error.message});
+  }
+
 });
 
 module.exports = router;
