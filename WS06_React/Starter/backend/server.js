@@ -16,11 +16,9 @@ async function connectToDatabase() {
       console.warn('MONGODB_URI is missing. Create a .env file before testing database features.');
       return;
     }
-
+  // 2) Use a try-catch block to safely connect to MongoDB with mongoose.connect()
     try {
-      // 2) Call mongoose.connect(process.env.MONGODB_URI, { dbName: 'blog' }).
       await mongoose.connect(process.env.MONGODB_URI, {dbName: 'blog'});
-      // 3) Log success and handle possible errors.
       console.log('Connected to MongoDB');
     } catch (error) {
       console.error('MongoDB connection error:', error.message);
